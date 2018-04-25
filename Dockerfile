@@ -2,7 +2,9 @@ FROM centos
 
 RUN yum -y install wget
 RUN wget http://yum.centreon.com/standard/3.4/el6/stable/noarch/RPMS/centreon-release-3.4-4.el6.noarch.rpm
-RUN yum install --nogpgcheck centreon-release-3.4-4.el6.noarch.rpm
+RUN yum install -y --nogpgcheck centreon-release-3.4-4.el6.noarch.rpm
+
+COPY MariaDB.repo /etc/yum.repos.d/
 
 # Install centreon
 RUN yum -y install MariaDB-server && /etc/init.d/mysql start && yum -y install centreon centreon-base-config-centreon-engine centreon-installed centreon-clapi && /etc/init.d/mysql stop
