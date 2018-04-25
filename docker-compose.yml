@@ -1,8 +1,17 @@
 version: '3'
 volumes: 
-  centreon-engine:
-  centreon-brocker:
+  db-data:
 
 services: 
   centreon-central:
     build: ./
+    environment:
+      - PHP_DATE_TIMEZONE=Europe/Paris
+    links: 
+      - db:db
+  db:
+    image: mariadb
+    environment: 
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+    volumes:
+      - db-data:/var/lib/mysql
