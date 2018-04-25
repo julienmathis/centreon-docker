@@ -1,0 +1,8 @@
+version: '3'
+volumes: 
+  centreon-engine:
+  centreon-brocker:
+
+services: 
+  centreon-central:
+    build: ./
