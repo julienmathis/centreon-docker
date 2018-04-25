@@ -1,6 +1,6 @@
 FROM centos
 
-RUN yum install wget
+RUN yum -y install wget
 RUN wget http://yum.centreon.com/standard/3.4/el6/stable/noarch/RPMS/centreon-release-3.4-4.el6.noarch.rpm
 RUN yum install --nogpgcheck centreon-release-3.4-4.el6.noarch.rpm
 
