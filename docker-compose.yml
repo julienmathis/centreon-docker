@@ -1,17 +1,23 @@
 version: '3'
 volumes: 
   db-data:
+  sock:
 
 services: 
   centreon-central:
-    build: ./
+    image: centreon-docker
     environment:
       - PHP_DATE_TIMEZONE=Europe/Paris
+    volumes:
+      - sock:/var/run
     links: 
       - db:db
+    ports: 
+      - 8080:80
   db:
     image: mariadb
     environment: 
       - MYSQL_ROOT_PASSWORD=my-secret-pw
     volumes:
       - db-data:/var/lib/mysql
+      - sock:/var/run

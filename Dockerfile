@@ -29,9 +29,15 @@ RUN chmod u+s /usr/lib/nagios/plugins/check_icmp
 RUN yum -y --nogpgcheck install python-setuptools
 RUN easy_install supervisor
 
+# Clean yum cache
+RUN yum clean all
+
 # Expose port HTTP for the service
 EXPOSE 80
 
-ENTRYPOINT ["container-entrypoint"]
+RUN chmod +x /usr/bin/container-entrypoint.sh
+RUN chmod +x /usr/bin/centreon-docker.sh
 
-CMD ['centreon-docker']
+ENTRYPOINT ["/usr/bin/centreon-docker.sh"]
+
+CMD ['/usr/bin/centreon-docker.sh']
