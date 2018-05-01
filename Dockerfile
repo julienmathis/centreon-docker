@@ -1,7 +1,7 @@
 FROM centos/systemd
 
 LABEL   maintainer="kbeaugrand" \
-        version="3.4-4.el7"
+        version="3.4-4.el7-1"
 
 # Prepares centreon installation
 RUN yum -y install wget && \
