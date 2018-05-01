@@ -1,23 +1,27 @@
-version: '3'
-volumes: 
-  db-data:
-  sock:
+version: '2'
 
 services: 
   centreon-central:
+    build: ./
     image: centreon-docker
+    container_name: centreon-central
+    privileged: true
     environment:
       - PHP_DATE_TIMEZONE=Europe/Paris
-    volumes:
-      - sock:/var/run
     links: 
       - db:db
     ports: 
-      - 8080:80
+      - "8080:80"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      
   db:
     image: mariadb
+    container_name: centreon-db
     environment: 
       - MYSQL_ROOT_PASSWORD=my-secret-pw
     volumes:
       - db-data:/var/lib/mysql
-      - sock:/var/run
+
+volumes: 
+  db-data:

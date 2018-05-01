@@ -1,16 +1,17 @@
-FROM centos
+FROM centos/systemd
 
-ADD root /
+LABEL   maintainer="kbeaugrand" \
+        version="3.4-4.el7"
 
-RUN yum -y install wget
-RUN wget http://yum.centreon.com/standard/3.4/el7/stable/noarch/RPMS/centreon-release-3.4-4.el7.centos.noarch.rpm
-RUN yum install --nogpgcheck -y centreon-release-3.4-4.el7.centos.noarch.rpm
-RUN rm centreon-release-3.4-4.el7.centos.noarch.rpm
+# Prepares centreon installation
+RUN yum -y install wget && \
+    wget http://yum.centreon.com/standard/3.4/el7/stable/noarch/RPMS/centreon-release-3.4-4.el7.centos.noarch.rpm  && \
+    yum install --nogpgcheck -y centreon-release-3.4-4.el7.centos.noarch.rpm && \
+    rm centreon-release-3.4-4.el7.centos.noarch.rpm
 
 # Install centreon
 RUN yum -y --nogpgcheck install centreon \
-                                centreon-base-config-centreon-engine \
-                                centreon-installed centreon-clapi
+                                centreon-base-config-centreon-engine
 
 # Install Widgets
 RUN yum -y install --nogpgcheck \ 
@@ -21,23 +22,22 @@ RUN yum -y install --nogpgcheck \
             centreon-widget-servicegroup-monitoring
 
 # Set rights for setuid
-RUN chown root:centreon-engine /usr/lib/nagios/plugins/check_icmp
-RUN chmod -w /usr/lib/nagios/plugins/check_icmp
-RUN chmod u+s /usr/lib/nagios/plugins/check_icmp
-
-# Install and configure supervisor
-RUN yum -y --nogpgcheck install python-setuptools
-RUN easy_install supervisor
+RUN chown root:centreon-engine /usr/lib/nagios/plugins/check_icmp && \
+    chmod -w /usr/lib/nagios/plugins/check_icmp && \
+    chmod u+s /usr/lib/nagios/plugins/check_icmp
 
 # Clean yum cache
 RUN yum clean all
 
+# Enable services
+RUN systemctl enable httpd.service && \
+    systemctl enable snmpd.service
+
+# Add repository files
+ADD root /
+
 # Expose port HTTP for the service
-EXPOSE 80
+EXPOSE 80 5669
 
-RUN chmod +x /usr/bin/container-entrypoint.sh
-RUN chmod +x /usr/bin/centreon-docker.sh
-
-ENTRYPOINT ["/usr/bin/centreon-docker.sh"]
-
-CMD ['/usr/bin/centreon-docker.sh']
+ENTRYPOINT [ "/usr/bin/container-entrypoint.sh" ]
+CMD [ "/usr/sbin/init" ]
