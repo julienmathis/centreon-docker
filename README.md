@@ -9,11 +9,16 @@ Write your docker-compose.yml
 version: '3'
 services: 
   centreon-central:
-    build: ./
+  image: kbeaugrand/centreon-central
+  privileged: true
     environment:
       - PHP_DATE_TIMEZONE=Europe/Paris
     links: 
       - db:db
+    ports: 
+      - "8080:80"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
   db:
     image: mariadb
     environment: 

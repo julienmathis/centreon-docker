@@ -3,7 +3,7 @@ version: '2'
 services: 
   centreon-central:
     build: ./
-    image: centreon-docker
+    image: centreon-central
     container_name: centreon-central
     privileged: true
     environment:
