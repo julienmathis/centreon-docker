@@ -9,8 +9,8 @@ Write your docker-compose.yml
 version: '3'
 services: 
   centreon-central:
-  image: kbeaugrand/centreon-central
-  privileged: true
+    image: kbeaugrand/centreon-central
+    privileged: true
     environment:
       - PHP_DATE_TIMEZONE=Europe/Paris
     links: 
