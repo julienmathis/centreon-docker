@@ -1,10 +1,9 @@
-version: '2'
-
+version: '3'
 services: 
   centreon-central:
     build: ./
     image: centreon-central
-    container_name: centreon-central
+    container_name: kbeaugrand/centreon-central
     privileged: true
     environment:
       - PHP_DATE_TIMEZONE=Europe/Paris
@@ -12,9 +11,11 @@ services:
       - db:db
     ports: 
       - "8080:80"
+    privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
-      - centreon-config:/etc/centreon-engine
+      - centreon-engine-config:/etc/centreon-engine
+      - centreon-broker-config:/etc/centreon-broker
       
   db:
     image: mariadb
@@ -26,4 +27,5 @@ services:
 
 volumes: 
   db-data:
-  centreon-config:
+  centreon-engine-config:
+  centreon-broker-config:
