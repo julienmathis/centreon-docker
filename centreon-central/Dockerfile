@@ -36,9 +36,6 @@ RUN systemctl enable httpd.service && \
 # Add repository files
 ADD root /
 
-# Create centreon's temporary directory
-# RUN mkdir /usr/share/centreon/www/tmp/ && chown centreon:apache -R /usr/share/centreon/www/ && chmod a+w /usr/share/centreon/www/tmp
-
 # Expose port HTTP for the service
 EXPOSE 80 5669
 

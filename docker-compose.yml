@@ -1,7 +1,7 @@
 version: '3'
 services: 
   centreon-central:
-    build: ./
+    build: ./centreon-central/
     image: kbeaugrand/centreon-central
     container_name: centreon-central
     privileged: true
@@ -18,7 +18,8 @@ services:
       - centreon-broker-config:/etc/centreon-broker
       
   db:
-    image: mariadb
+    build: ./centreon-db/
+    image: kbeaugrand/centreon-db
     container_name: centreon-db
     environment: 
       - MYSQL_ROOT_PASSWORD=my-secret-pw
