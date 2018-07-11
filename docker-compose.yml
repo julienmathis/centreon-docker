@@ -2,8 +2,8 @@ version: '3'
 services: 
   centreon-central:
     build: ./
-    image: centreon-central
-    container_name: kbeaugrand/centreon-central
+    image: kbeaugrand/centreon-central
+    container_name: centreon-central
     privileged: true
     environment:
       - PHP_DATE_TIMEZONE=Europe/Paris

@@ -27,7 +27,7 @@ Vagrant.configure("2") do |config|
 		# Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
 		# documentation for more information about their specific syntax and use.
 	  config.vm.provision "shell", inline: <<-SHELL
-		  yum update update
+		  yum update -y
 	  	curl -L https://github.com/docker/compose/releases/download/1.21.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/bin/docker-compose
 		  sudo chmod +x /usr/bin/docker-compose
 		  yum-config-manager \
@@ -35,7 +35,8 @@ Vagrant.configure("2") do |config|
 					https://download.docker.com/linux/centos/docker-ce.repo
 		  yum install -y docker-ce git nano
 		  systemctl enable docker
-		  yum clean all
+			yum clean all
+			rm -rf /var/cache/yum
 	  SHELL
   end
 end
