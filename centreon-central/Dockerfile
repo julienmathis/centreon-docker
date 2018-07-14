@@ -26,15 +26,32 @@ RUN chown root:centreon-engine /usr/lib/nagios/plugins/check_icmp && \
     chmod -w /usr/lib/nagios/plugins/check_icmp && \
     chmod u+s /usr/lib/nagios/plugins/check_icmp
 
-# Clean yum cache
-RUN yum clean all
-
 # Enable services
 RUN systemctl enable httpd.service && \
     systemctl enable snmpd.service
 
 # Add repository files
 ADD root /
+
+# Apply patch
+RUN yum install -y git && \
+    cd /usr/share/centreon && \
+    chmod 644 /usr/share/centreon/www/ -R && \
+    git apply fix-tmp-paths.patch && \
+    chmod 755 /usr/share/centreon/www/ -R && \
+    yum remove -y git && \
+    yum autoremove -y
+
+# Creating temprorary directory
+RUN mkdir /usr/share/centreon/www/install/tmp && \ 
+    chmod 755 -R /usr/share/centreon/www/install/tmp
+
+# Change centreon's owner
+RUN chown apache:apache -R /usr/share/centreon/www/
+
+# Clean yum cache
+RUN yum clean all && \ 
+    rm -rf /var/cache/yum
 
 # Expose port HTTP for the service
 EXPOSE 80 5669

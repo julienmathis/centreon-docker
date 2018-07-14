@@ -8,22 +8,37 @@ Write your docker-compose.yml
 
 ```yml
 version: '3'
-services:
+services: 
   centreon-central:
+    build: ./centreon-central/
     image: kbeaugrand/centreon-central
+    container_name: centreon-central
     privileged: true
     environment:
       - PHP_DATE_TIMEZONE=Europe/Paris
-    links:
+    links: 
       - db:db
-    ports:
+    ports: 
       - "8080:80"
+    privileged: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - centreon-engine-config:/etc/centreon-engine
+      - centreon-broker-config:/etc/centreon-broker
+      
   db:
-    image: mariadb
-    environment:
+    build: ./centreon-db/
+    image: kbeaugrand/centreon-db
+    container_name: centreon-db
+    environment: 
       - MYSQL_ROOT_PASSWORD=my-secret-pw
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes: 
+  db-data:
+  centreon-engine-config:
+  centreon-broker-config:
 ```
 
 Start your stack
