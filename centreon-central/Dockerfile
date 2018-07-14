@@ -30,17 +30,26 @@ RUN chown root:centreon-engine /usr/lib/nagios/plugins/check_icmp && \
 RUN systemctl enable httpd.service && \
     systemctl enable snmpd.service
 
+# Install git for patch
+RUN yum install -y git
+
 # Add repository files
 ADD root /
 
-# Apply patch
-RUN yum install -y git && \
-    cd /usr/share/centreon && \
+# Apply patches
+RUN cd /usr/share/centreon && \
     chmod 644 /usr/share/centreon/www/ -R && \
-    git apply fix-tmp-paths.patch && \
-    chmod 755 /usr/share/centreon/www/ -R && \
-    yum remove -y git && \
+    git apply fix-install.patch && \
+    git apply fix-upgrade.patch && \
+    chmod 755 /usr/share/centreon/www/ -R
+
+# Remove git since it won't be usefull
+RUN yum remove -y git && \
     yum autoremove -y
+
+# Remove patchs
+RUN rm -f /usr/share/centreon/fix-install.patch && \
+    rm -f /usr/share/centreon/fix-upgrade.patch
 
 # Creating temprorary directory
 RUN mkdir /usr/share/centreon/www/install/tmp && \ 

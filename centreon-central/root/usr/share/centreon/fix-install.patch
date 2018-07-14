@@ -1,5 +1,5 @@
 diff --git a/www/install/steps/step8.php b/www/install/steps/step8.php
-index a37127a..0123d79 100644
+index a37127a..923a83d 100644
 --- a/www/install/steps/step8.php
 +++ b/www/install/steps/step8.php
 @@ -44,15 +44,6 @@ $title = _('Installation finished');
@@ -28,6 +28,6 @@ index a37127a..0123d79 100644
 +    $contents .= '<br>Warning : The installation directory cannot be move. Please create the directory ' . $centreon_path . '/installDir and give it the rigths to apache user to write.';
 +} else {
 +    $name = 'install-' . $_SESSION['version'] . '-' . date('Ymd_His');
-+    system("mv ". realpath(str_replace('steps', '', getcwd())) . " " .  $centreon_path . '/installDir/' . $name);
++    system('mv '. realpath(str_replace('steps', '', getcwd())) . ' ' .  $centreon_path . '/installDir/' . $name);
 +}
 \ No newline at end of file
