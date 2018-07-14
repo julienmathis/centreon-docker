@@ -67,4 +67,4 @@ You can map the following mounting point to your docker volume or your file syst
 
 You can map the following mounting points to your docker volumes or your file system mounting points:
 
-* `/etc/centreon-engine`
+* `/etc/centreon`
