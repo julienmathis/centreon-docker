@@ -39,8 +39,7 @@ ADD root /
 # Apply patches
 RUN cd /usr/share/centreon && \
     chmod 644 /usr/share/centreon/www/ -R && \
-    git apply fix-install.patch && \
-    git apply fix-upgrade.patch && \
+    git apply 2.8.24.patch && \
     chmod 755 /usr/share/centreon/www/ -R
 
 # Remove git since it won't be usefull
@@ -48,8 +47,7 @@ RUN yum remove -y git && \
     yum autoremove -y
 
 # Remove patchs
-RUN rm -f /usr/share/centreon/fix-install.patch && \
-    rm -f /usr/share/centreon/fix-upgrade.patch
+RUN rm -f /usr/share/centreon/2.8.24.patch
 
 # Creating temprorary directory
 RUN mkdir /usr/share/centreon/www/install/tmp && \ 
