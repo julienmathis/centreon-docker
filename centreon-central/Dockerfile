@@ -21,6 +21,9 @@ RUN yum -y install --nogpgcheck \
             centreon-widget-hostgroup-monitoring \
             centreon-widget-servicegroup-monitoring
 
+# Install all plugins
+RUN yum -y install --nogpgcheck centreon-plugins-*
+
 # Set rights for setuid
 RUN chown root:centreon-engine /usr/lib/nagios/plugins/check_icmp && \
     chmod -w /usr/lib/nagios/plugins/check_icmp && \
