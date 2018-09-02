@@ -1,0 +1,30 @@
+version: '3'
+services: 
+  centreon-central:
+    build: ./centreon-central/
+    image: kbeaugrand/centreon-central:latest
+    container_name: centreon-central
+    privileged: true
+    environment:
+      - PHP_DATE_TIMEZONE=Europe/Paris
+    links: 
+      - db:db
+    ports: 
+      - "8080:80"
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - centreon-config:/etc/centreon
+      
+  db:
+    build: ./centreon-db/
+    image: kbeaugrand/centreon-db:latest
+    container_name: centreon-db
+    environment: 
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes: 
+  db-data:
+  centreon-config:

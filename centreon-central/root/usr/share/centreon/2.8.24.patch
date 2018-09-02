@@ -1,0 +1,186 @@
+diff --git a/www/Themes/Centreon-2/style.css b/www/Themes/Centreon-2/style.css
+index 9be9fc4..decbb70 100644
+--- a/www/Themes/Centreon-2/style.css
++++ b/www/Themes/Centreon-2/style.css
+@@ -609,7 +609,11 @@ input[type="submit"] {
+     top: 45px;
+     right: 10px;
+ }
+-
++#centreon-warning{
++    background: orange;
++    line-height: 30px;
++    padding-left: 30px;
++}
+ form#AjaxBankBasic {
+     padding-bottom: 0px;
+ }
+diff --git a/www/include/core/menu/menu.php b/www/include/core/menu/menu.php
+index e3bdfc1..1156840 100644
+--- a/www/include/core/menu/menu.php
++++ b/www/include/core/menu/menu.php
+@@ -305,6 +305,14 @@ if ($is_admin) {
+ $tpl->assign('amIadmin', $centreon->user->admin);
+ 
+ /*
++ * Install directory present
++ */
++if (is_dir(realpath(dirname(__FILE__) . '/../../../install'))) {
++    $tpl->assign('displayWarning', 1);
++    $tpl->assign('WarningMessage', '<b>Warning</b> : The installation directory has not been deleted! For security reasons, administrator would have to remove it manually.');
++}
++
++/*
+  * Display
+  */
+ $tpl->display("BlockHeader.ihtml");
+diff --git a/www/include/core/menu/templates/BlockHeader.ihtml b/www/include/core/menu/templates/BlockHeader.ihtml
+index e66b857..eb1c683 100644
+--- a/www/include/core/menu/templates/BlockHeader.ihtml
++++ b/www/include/core/menu/templates/BlockHeader.ihtml
+@@ -99,6 +99,11 @@
+ 	</div>
+ 	<div id="centreonMsg"></div>
+ </div>
++{if $displayWarning == 1}
++<div id="centreon-warning">
++	{$WarningMessage}
++</div>
++{/if}
+ {literal}
+ <script type='text/javascript'>
+ /*
+diff --git a/www/install/step_upgrade/functions.php b/www/install/step_upgrade/functions.php
+index 4701a57..1f18025 100644
+--- a/www/install/step_upgrade/functions.php
++++ b/www/install/step_upgrade/functions.php
+@@ -123,4 +123,25 @@ function aff_footer()
+     <?php
+ }
+ 
++/**
++ * Recursively removes a folder along with all its files and directories
++ * 
++ * @param String $path 
++ * @return Boolean True if the directory was removed, False otherwise
++ */
++function rrmdir($path) {
++    // Open the source directory to read in files
++    $i = new DirectoryIterator($path);
++
++    foreach($i as $f) {
++        if($f->isFile()) {
++            unlink($f->getRealPath());
++        } else if(!$f->isDot() && $f->isDir()) {
++            rrmdir($f->getRealPath());
++        }
++    }
++
++    return rmdir($path);
++}
++
+ ?>
+\ No newline at end of file
+diff --git a/www/install/step_upgrade/step5.php b/www/install/step_upgrade/step5.php
+index 75d1b81..c0abcdb 100644
+--- a/www/install/step_upgrade/step5.php
++++ b/www/install/step_upgrade/step5.php
+@@ -47,21 +47,14 @@ $contents = sprintf(
+     $_SESSION['CURRENT_VERSION']
+ );
+ 
+-$centreon_path = realpath(dirname(__FILE__) . '/../../../');
+-
+-if (false === is_dir($centreon_path . '/installDir')) {
+-    $contents .= '<br>Warning : The installation directory cannot be move. Please create the directory '
+-        . $centreon_path . '/installDir and give it the rigths to apache user to write.';
+-} else {
+-    $name = 'install-' . $_SESSION['CURRENT_VERSION'] . '-' . date('Ymd_His');
+-    @rename(str_replace('step_upgrade', '', getcwd()), $centreon_path . '/installDir/' . $name);
+-}
+-
+-session_destroy();
+-
+ $template->assign('step', STEP_NUMBER);
+ $template->assign('title', $title);
+ $template->assign('content', $contents);
+ $template->assign('finish', 1);
+ $template->assign('blockPreview', 1);
+ $template->display('content.tpl');
++
++session_destroy();
++
++# Removing installation directory
++rrmdir(realpath(dirname(__FILE__) . '/../../install'));
+\ No newline at end of file
+diff --git a/www/install/steps/functions.php b/www/install/steps/functions.php
+index d22a976..cfa86f7 100644
+--- a/www/install/steps/functions.php
++++ b/www/install/steps/functions.php
+@@ -261,4 +261,25 @@ function getDatabaseVariable($variable) {
+     return $value;
+ }
+ 
++/**
++ * Recursively removes a folder along with all its files and directories
++ * 
++ * @param String $path 
++ * @return Boolean True if the directory was removed, False otherwise
++ */
++function rrmdir($path) {
++    // Open the source directory to read in files
++    $i = new DirectoryIterator($path);
++
++    foreach($i as $f) {
++        if($f->isFile()) {
++            unlink($f->getRealPath());
++        } else if(!$f->isDot() && $f->isDir()) {
++            rrmdir($f->getRealPath());
++        }
++    }
++
++    return rmdir($path);
++}
++
+ ?>
+diff --git a/www/install/steps/step8.php b/www/install/steps/step8.php
+index a37127a..95d5a35 100644
+--- a/www/install/steps/step8.php
++++ b/www/install/steps/step8.php
+@@ -38,27 +38,22 @@ DEFINE('STEP_NUMBER', 8);
+ $_SESSION['step'] = STEP_NUMBER;
+ 
+ require_once 'functions.php';
++require_once ("process/advertising.php");
++
+ $template = getTemplate('./templates');
+ 
+ $title = _('Installation finished');
+ 
+ $contents = '<div>'._('Congratulations, you have successfully installed Centreon!').'</div>';
+-
+-$centreon_path = realpath(dirname(__FILE__) . '/../../../');
+-
+-if (false === is_dir($centreon_path . '/installDir')) {
+-    $contents .= '<br>Warning : The installation directory cannot be move. Please create the directory ' . $centreon_path . '/installDir and give it the rigths to apache user to write.';
+-} else {
+-    $name = 'install-' . $_SESSION['version'] . '-' . date('Ymd_His');
+-    @rename(str_replace('steps', '', getcwd()), $centreon_path . '/installDir/' . $name);
+-}
+-
+-session_destroy();
+-require_once ("process/advertising.php");
++          
+ $template->assign('step', STEP_NUMBER);
+ $template->assign('title', $title);
+-$template->assign('content', $contents);
+ $template->assign('finish', 1);
+ $template->assign('blockPreview', 1);
++$template->assign('content', $contents);
+ $template->display('content.tpl');
+ 
++session_destroy();
++
++# Removing installation directory
++rrmdir(realpath(dirname(__FILE__) . '/../../install'));
+\ No newline at end of file
